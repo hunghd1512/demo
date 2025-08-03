@@ -17,6 +17,8 @@ public class ReceiveMessage {
     public void listenGroupFoo(String message) throws Exception {
         System.out.println("Received Message in group foo: " + message);
         MessageInfo messageInfo = new MessageInfo();
+        messageInfo.setFrom("hung");
+        messageInfo.setTo("hung");
         String id = UUID.randomUUID().toString();
         sendToSocket.sendSpecific(messageInfo,id);
     }

@@ -18,7 +18,7 @@ public class SendToSocket {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/secured/room")
+    @MessageMapping("/hello")
     public void sendSpecific(
             @Payload MessageInfo msg,
             @Header("simpSessionId") String sessionId) throws Exception {

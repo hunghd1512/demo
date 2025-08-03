@@ -1,11 +1,11 @@
 const stompClient = new StompJs.Client({
-    brokerURL: 'ws://localhost:8080/api/ws'
+    brokerURL: 'ws://localhost:8080/api/secured/room'
 });
 
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/user/queue/hung', (greeting) => {
+    stompClient.subscribe('/secured/user/queue/specific-user', (greeting) => {
         showGreeting(JSON.parse(greeting.body).content);
     });
 };
@@ -43,7 +43,7 @@ function disconnect() {
 
 function sendName() {
     stompClient.publish({
-        destination: "/app/hello",
+        destination: "/spring-security-mvc-socket/hello",
         body: JSON.stringify({'name': $("#name").val()})
     });
 }
