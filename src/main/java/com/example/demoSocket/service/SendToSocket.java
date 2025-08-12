@@ -29,4 +29,9 @@ public class SendToSocket {
         simpMessagingTemplate.convertAndSendToUser(
                 msg.getTo(), "/secured/user/queue/specific-user", out);
     }
+
+
+    public void sendBoardCast(MessageInfo msg) throws Exception {
+        simpMessagingTemplate.convertAndSend("/queue/board-cast", msg);
+    }
 }

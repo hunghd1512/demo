@@ -1,12 +1,13 @@
 const stompClient = new StompJs.Client({
-    brokerURL: 'ws://localhost:8080/api/secured/room'
+    brokerURL: 'ws://localhost:8081/api/secured/room'
 });
 
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/secured/user/queue/specific-user', (greeting) => {
-        showGreeting(JSON.parse(greeting.body).content);
+    stompClient.subscribe('/queue/board-cast', (greeting) => {
+        console.log((JSON.parse(greeting.body)));
+        showGreeting(JSON.parse(greeting.body).to);
     });
 };
 

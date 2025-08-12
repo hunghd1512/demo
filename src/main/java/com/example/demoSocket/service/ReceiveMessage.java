@@ -20,6 +20,6 @@ public class ReceiveMessage {
         messageInfo.setFrom("hung");
         messageInfo.setTo("hung");
         String id = UUID.randomUUID().toString();
-        sendToSocket.sendSpecific(messageInfo,id);
+        sendToSocket.sendBoardCast(messageInfo);
     }
 }
