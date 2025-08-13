@@ -5,7 +5,7 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
-    stompClient.subscribe('/queue/board-cast', (greeting) => {
+    stompClient.subscribe('/secured/user/queue/specific-user', (greeting) => {
         console.log((JSON.parse(greeting.body)));
         showGreeting(JSON.parse(greeting.body).to);
     });

@@ -18,9 +18,9 @@ public class SendToSocket {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/hello")
+    @MessageMapping("/hello")  // Vì @MessageMapping là điểm vào WebSocket từ client ,Spring cần biết bạn là ai để phân quyền + gán session
     public void sendSpecific(
-            @Payload MessageInfo msg,
+            @Payload MessageInfo msg,Principal user,
             @Header("simpSessionId") String sessionId) throws Exception {
         MessageDetail out = new MessageDetail(
                 msg.getFrom(),

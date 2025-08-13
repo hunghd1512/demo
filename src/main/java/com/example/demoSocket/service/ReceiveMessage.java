@@ -4,8 +4,10 @@ import com.example.demoSocket.entity.MessageDetail;
 import com.example.demoSocket.entity.MessageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @Component
@@ -20,6 +22,6 @@ public class ReceiveMessage {
         messageInfo.setFrom("hung");
         messageInfo.setTo("hung");
         String id = UUID.randomUUID().toString();
-        sendToSocket.sendBoardCast(messageInfo);
+        sendToSocket.sendSpecific(messageInfo,id);
     }
 }

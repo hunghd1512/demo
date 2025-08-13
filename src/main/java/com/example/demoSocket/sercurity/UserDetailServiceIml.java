@@ -38,11 +38,17 @@ public class UserDetailServiceIml implements UserDetailsService {
         for(Role role:roles) {
             ga.add(new SimpleGrantedAuthority(role.getName()));
         }
-
-        springUser = new org.springframework.security.core.userdetails.User(
-                email,
-                user.getPassword(),
-                ga );
+        if(ga.isEmpty()){
+            springUser = new org.springframework.security.core.userdetails.User(
+                    email,
+                    user.getPassword(),
+                    List.of(new SimpleGrantedAuthority("ROLE_USER") ));
+        }else {
+            springUser = new org.springframework.security.core.userdetails.User(
+                    email,
+                    user.getPassword(),
+                    ga);
+        }
         return springUser;
     }
 }

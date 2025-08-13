@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -36,16 +37,18 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        return new UsernamePasswordAuthenticationToken(
+        return new JwtAuthenticationToken(
                 userDetails,
                 null,
-                userDetails.getAuthorities()
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        // chỉ xử lý token dạng UsernamePasswordAuthenticationToken, có credentials là JWT
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        System.out.println("supports ---------------------------------" + authentication);
+        return JwtAuthenticationToken.class.isAssignableFrom(authentication) || UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+
     }
+
 }

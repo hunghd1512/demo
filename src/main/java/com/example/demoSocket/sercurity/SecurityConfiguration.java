@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,7 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -27,30 +33,49 @@ public class SecurityConfiguration {
 
     @Autowired
     private JwtAuthenticationProvider jwtAuthenticationProvider;
-
-//    @Autowired
-//    private DaoAuthenticationProvider daoAuthenticationProvider;
-
-    @Autowired
-    @Lazy
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
     @Autowired
     private AuthEntryPointJwt authenticationEntryPoint;
 
     @Autowired
     private UserDetailServiceIml userDetailServiceIml;
+    //    @Autowired
+//    private DaoAuthenticationProvider daoAuthenticationProvider;
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        List<AuthenticationProvider> providers = new ArrayList<>();
+        providers.add(jwtAuthenticationProvider);
+        providers.add(daoAuthenticationProvider()); // nếu muốn
+        return new ProviderManager(providers);
+    }
 
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtils jwtUtils, AuthenticationManager authManager) {
+        return new JwtAuthenticationFilter(jwtUtils, authManager);
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailServiceIml);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .authorizeHttpRequests(req -> req.requestMatchers("/h2-console/**","/auth/login","/**", "/index.html", "/main.css", "/js/**", "/images/**")
+                .authorizeHttpRequests(req -> req.requestMatchers("/h2-console/**", "/auth/login", "/secured/room", "/index.html", "/main.css", "/js/**", "/images/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST,"/api/**").permitAll()
+                        //     .requestMatchers(HttpMethod.POST,"/api/**").permitAll()
                         .anyRequest()
                         .authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
@@ -65,25 +90,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailServiceIml);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 
 }
